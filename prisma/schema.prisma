@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model User{
+  id Int @id @default(autoincrement())
+  JoinedAt  DateTime  @default(now())
+  userName String   
+  email    String    @unique
+  password  String  
+  role   Role    @default(USER)
+  shops   Shops[]
+  cart   Cart[]
+  order  Orders[]
+  review  Review[]
+  payment  Payment[]
+}
+
+model Shops{
+  id Int @id @default(autoincrement())
+  JoinedAt  DateTime  @default(now())
+  ShopName String  @unique
+  userID    Int
+  user   User  @relation(fields: [userID],references: [id])
+  products  Products[]
+
+}
+
+model Products{
+  id Int @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  productName  String
+  price    Float
+  inStock   Int
+  shopID    Int
+  shop   Shops @relation(fields: [shopID],references: [id])
+}
+
+model Cart{
+  id Int @id @default(autoincrement())
+  userID  Int
+  user   User  @relation(fields: [userID],references: [id])
+  purchased  Boolean
+  order    Orders[]
+
+}
+
+model Orders{
+  id           Int              @id @default(autoincrement())
+  cartID       Int
+  cart          Cart             @relation(fields: [cartID],references: [id])
+  orderDate   DateTime      @default(now())
+  totalPrice   Float  
+  userID        Int 
+  user        User        @relation(fields: [userID],references: [id])
+  payment     Payment[]
+  
+}
+
+model Payment{
+  id  Int  @id @default(autoincrement())
+  orderID   Int
+  order    Orders  @relation(fields: [orderID],references: [id])
+  status Boolean
+  userID    Int
+  user   User   @relation(fields: [userID],references: [id])
+
+}
+
+model Review{
+  id  Int  @id @default(autoincrement())
+  message  String 
+  rating  Float
+  userID  Int
+  user   User  @relation(fields: [userID],references: [id])
+  
+}
+
+
+enum Role{
+  USER 
+  ADMIN
+  TRADER
+}
