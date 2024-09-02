@@ -36,6 +36,7 @@ model Shops{
   userID    Int
   user   User  @relation(fields: [userID],references: [id])
   products  Products[]
+  shopImage  String?
 
 }
 
@@ -47,6 +48,7 @@ model Products{
   inStock   Int
   shopID    Int
   shop   Shops @relation(fields: [shopID],references: [id])
+  productImage   String  
 }
 
 model Cart{
